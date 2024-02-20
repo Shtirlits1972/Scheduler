@@ -1,2 +1,3 @@
-# Scheduler
- app for create schedule
+# scheduler_app
+
+A new Flutter project.

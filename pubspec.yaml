@@ -1,0 +1,41 @@
+name: scheduler_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: 
+  flutter_bloc: ^8.1.3
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  intl: 
+  cloud_firestore:
+  flutter_launcher_icons: ^0.13.1
+  flutter_datetime_picker_plus: ^2.1.0
+  bottom_sheet: ^4.0.0
+
+flutter_launcher_icons:
+  #  image_path: "assets/images/icon-128x128.png"
+  image_path_android: "assets/images/icon_192.png"
+  image_path_ios: "assets/images/icon_192.pngs"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
+  adaptive_icon_background: "assets/images/icon_192.png" # only available for Android 8.0 devices and above
+  adaptive_icon_foreground: "assets/images/icon_192.pngs" # only available for Android 8.0 devices and above
+  adaptive_icon_monochrome: "assets/images/icon_192.pngs" # only available for Android 13 devices and above
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true
+  background_color_ios: "#ffffff"
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 
+
+flutter:
+  uses-material-design: true
