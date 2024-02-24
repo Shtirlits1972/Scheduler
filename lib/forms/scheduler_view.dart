@@ -61,7 +61,7 @@ class _SchedulerViewState extends State<SchedulerView> {
           if (snapshot.data == null) {
             return const Center(child: CircularProgressIndicator());
           } else {
-            if (snapshot.data!.docs.length == 0) {
+            if (snapshot.data!.docs.isEmpty) {
               return Center(
                 child: Text(
                   'Нет Данных',
@@ -90,7 +90,7 @@ class _SchedulerViewState extends State<SchedulerView> {
                         .catchError((error) => print('Delete failed: $error'));
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Text('мероприятие удалено!'),
                       ),
                     );
@@ -98,7 +98,6 @@ class _SchedulerViewState extends State<SchedulerView> {
                   },
                   child: GestureDetector(
                     onLongPress: () {
-                      //   print('long press   ${ds['LocationName']} ');
                       events model = events.fromDocSnapshot(ds);
 
                       Navigator.pushNamed(context, '/ShedulerAdd',
@@ -108,8 +107,9 @@ class _SchedulerViewState extends State<SchedulerView> {
                       margin: const EdgeInsets.all(5.0),
                       padding: const EdgeInsets.all(8.0),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(15.0) //
-                            ),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(15.0) //
+                                ),
                         border: Border.all(color: Colors.blueAccent),
                       ),
                       child: Column(

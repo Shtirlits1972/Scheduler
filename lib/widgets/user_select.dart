@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scheduler_app/constants.dart';
 
-class MasterSelect extends StatefulWidget {
-  MasterSelect(
+class UserSelect extends StatefulWidget {
+  UserSelect(
       {Key? key,
       required this.user_id,
       required this.user_role,
@@ -13,13 +13,15 @@ class MasterSelect extends StatefulWidget {
   String user_id;
   String user_role;
   final Function(String) callback;
+
   @override
-  _MasterSelectState createState() => _MasterSelectState();
+  _UserSelectState createState() => _UserSelectState();
 }
 
-class _MasterSelectState extends State<MasterSelect> {
+class _UserSelectState extends State<UserSelect> {
   @override
   Widget build(BuildContext context) {
+    String valueRes = widget.user_id;
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -83,12 +85,27 @@ class _MasterSelectState extends State<MasterSelect> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: ElevatedButton(
-                        child: const Text('выбрать'),
-                        onPressed: () {
-                          widget.callback(widget.user_id);
-                          Navigator.pop(context, widget.user_id);
-                        }),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                            child: const Text('Ok'),
+                            onPressed: () {
+                              setState(() {
+                                valueRes = widget.user_id;
+                              });
+
+                              widget.callback(valueRes);
+                              Navigator.pop(context, valueRes);
+                            }),
+                        ElevatedButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.pop(context, valueRes);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

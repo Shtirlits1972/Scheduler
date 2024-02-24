@@ -7,9 +7,8 @@ import 'package:scheduler_app/constants.dart';
 import 'package:scheduler_app/model/events.dart';
 import 'package:scheduler_app/model/location.dart';
 import 'package:scheduler_app/model/users.dart';
-import 'package:scheduler_app/widgets/client_select.dart';
+import 'package:scheduler_app/widgets/user_select.dart';
 import 'package:scheduler_app/widgets/locations_select.dart';
-import 'package:scheduler_app/widgets/master_select.dart';
 
 class ShedulerAdd extends StatefulWidget {
   ShedulerAdd({Key? key, required this.model}) : super(key: key);
@@ -75,13 +74,14 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                         margin: const EdgeInsets.all(15.0),
                         padding: const EdgeInsets.all(3.0),
                         decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.elliptical(
-                                16,
-                                16,
-                              ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.elliptical(
+                              16,
+                              16,
                             ),
-                            border: Border.all(color: Colors.blueAccent)),
+                          ),
+                          border: Border.all(color: Colors.blueAccent),
+                        ),
                         child: TextButton(
                           onPressed: () {
                             picker.DatePicker.showDateTimePicker(context,
@@ -295,7 +295,8 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                                 snapshot.docs[i]['password'],
                                 snapshot.docs[i]['userName'],
                                 snapshot.docs[i]['role'],
-                                snapshot.docs[i]['IsApproved']);
+                                snapshot.docs[i]['IsApproved'],
+                                snapshot.docs[i]['fotoUrl']);
 
                             listMaster.add(master);
                           }
@@ -309,7 +310,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                             context: context,
                             builder: (BuildContext context) {
                               int y = 0;
-                              return MasterSelect(
+                              return UserSelect(
                                 user_id: widget.model.master.id,
                                 user_role: 'master',
                                 callback: (value) {
@@ -381,12 +382,14 @@ class _ShedulerAddState extends State<ShedulerAdd> {
 
                           for (int i = 0; i < snapshot.docs.length; i++) {
                             users client = users(
-                                snapshot.docs[i].id,
-                                snapshot.docs[i]['email'],
-                                snapshot.docs[i]['password'],
-                                snapshot.docs[i]['userName'],
-                                snapshot.docs[i]['role'],
-                                snapshot.docs[i]['IsApproved']);
+                              snapshot.docs[i].id,
+                              snapshot.docs[i]['email'],
+                              snapshot.docs[i]['password'],
+                              snapshot.docs[i]['userName'],
+                              snapshot.docs[i]['role'],
+                              snapshot.docs[i]['IsApproved'],
+                              snapshot.docs[i]['fotoUrl'],
+                            );
 
                             listClient.add(client);
                           }
@@ -400,7 +403,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                             context: context,
                             builder: (BuildContext context) {
                               int y = 0;
-                              return ClientSelect(
+                              return UserSelect(
                                 user_id: widget.model.client.id,
                                 user_role: 'client',
                                 callback: (value) {

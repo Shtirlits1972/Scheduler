@@ -69,8 +69,14 @@ class _UsersViewState extends State<UsersView> {
                   child: GestureDetector(
                     onLongPress: () {
                       print('long press   ${ds['userName']} ');
-                      users model = users(ds.id, ds['email'], ds['password'],
-                          ds['userName'], ds['role'], ds['IsApproved']);
+                      users model = users(
+                          ds.id,
+                          ds['email'],
+                          ds['password'],
+                          ds['userName'],
+                          ds['role'],
+                          ds['IsApproved'],
+                          ds['fotoUrl']);
 
                       Navigator.pushNamed(context, '/UsersAddForm',
                           arguments: model);

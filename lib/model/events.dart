@@ -43,9 +43,10 @@ class events {
     String clientUserName = ds['client']['userName'];
     String clientRole = ds['client']['role'];
     bool clientIsApproved = ds['client']['IsApproved'];
+    String clientFotoUrl = ds['client']['fotoUrl'];
 
     users client = users(clientId, clientEmail, clientPassword, clientUserName,
-        clientRole, clientIsApproved);
+        clientRole, clientIsApproved, clientFotoUrl);
 
     String masterId = ds['master']['id'];
     String masterEmail = ds['master']['email'];
@@ -54,9 +55,10 @@ class events {
     String masterUserName = ds['master']['userName'];
     String masterRole = ds['master']['role'];
     bool masterIsApproved = ds['master']['IsApproved'];
+    String masterFotoUrl = ds['master']['fotoUrl'];
 
     users master = users(masterId, masterEmail, masterPassword, masterUserName,
-        masterRole, masterIsApproved);
+        masterRole, masterIsApproved, masterFotoUrl);
 
     return events(ds.id, locat, client, master, ds['start'].toDate(),
         ds['finish'].toDate());
