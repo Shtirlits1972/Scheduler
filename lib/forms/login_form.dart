@@ -87,6 +87,18 @@ class _LoginFormState extends State<LoginForm> {
                                       .limit(1)
                                       .get();
 
+                              if (FirebaseAuth.instance.currentUser != null) {
+                                await FirebaseAuth.instance.signOut();
+                              }
+
+                              // var userCred = await FirebaseAuth.instance
+                              //     .signInWithEmailAndPassword(
+                              //         email: loginController.text,
+                              //         password: passController.text);
+
+                              // print(userCred);
+                              // int g = 0;
+
                               if (snapshot.size > 0) {
                                 users userAvtorize =
                                     users.fromQuerySnapshot(snapshot);

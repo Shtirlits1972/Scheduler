@@ -6,9 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_picture_uploader/firebase_picture_uploader.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scheduler_app/auth.dart';
 import 'package:scheduler_app/block/block.dart';
@@ -24,7 +26,14 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  Image img = Image.asset('assets/images/no_foto.jpg');
+  Widget imgNoFoto = Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Image.asset(
+      'assets/images/no_foto.jpg',
+      height: 250,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     TextEditingController passController = TextEditingController();
@@ -47,10 +56,16 @@ class _UserProfileState extends State<UserProfile> {
           displayNameController.text =
               context.read<DataCubit>().getUser.userName;
 
+          Widget widgFoto =
+              getUserImage(context.read<DataCubit>().getUser.fotoUrl);
+
           int h = 0;
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              Expanded(
+                child: widgFoto,
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(10),
@@ -75,30 +90,6 @@ class _UserProfileState extends State<UserProfile> {
                   ),
                 ),
               ),
-              Expanded(
-                child: GestureDetector(
-                  child: img,
-                  onTap: () {
-                    FilePicker.platform
-                        .pickFiles(type: FileType.image)
-                        .then((value) {
-                      if (value != null && value.count > 0) {
-                        setState(() {
-                          String fileName = value!.files.single.path!.substring(
-                              value!.files.single.path!.lastIndexOf('/'));
-                          print(fileName);
-                          img = Image.file(File(value!.files.single.path!));
-                        });
-                      } else {
-                        print('Canceled');
-                      }
-                    });
-                  },
-                ),
-
-                // getUserImage(context.read<DataCubit>().getUser.fotoUrl),
-              ),
-
               //   кнопки
               Expanded(
                 child: Row(
@@ -172,56 +163,190 @@ class _UserProfileState extends State<UserProfile> {
   }
 
   Center getUserImage(String fotoUrl) {
-    Widget imgWidget = Image.asset('assets/images/no_foto.jpg');
-
     if (fotoUrl.trim().isNotEmpty) {
-      imgWidget = Image.network(fotoUrl);
+      String url = fotoUrl;
+      return Center(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Image.network(url),
+            ),
+            Expanded(
+                flex: 1,
+                child: ElevatedButton(
+                  child: Text('Удалить фото'),
+                  onPressed: () async {
+                    print('delete foto');
+
+                    try {
+                      await FirebaseStorage.instance
+                          .refFromURL(context.read<DataCubit>().getUser.fotoUrl)
+                          .delete();
+                      //     .whenComplete(() {
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Фото удалено!')));
+                      //   print('foto deleted');
+                      // }).catchError((err) {
+                      //   print(err);
+                      // });
+
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(context.read<DataCubit>().getUser.id)
+                          .update(
+                        {
+                          'fotoUrl': '',
+                        },
+                      );
+
+                      imgNoFoto = Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Image.asset(
+                          'assets/images/no_foto.jpg',
+                          height: 250,
+                        ),
+                      );
+
+                      setState(() {
+                        context.read<DataCubit>().getUser.fotoUrl = '';
+                        url = '';
+                      });
+                      // })
+                      // .catchError((Error2) {
+                      //   print(Error2);
+                      // });
+                    } on FirebaseException catch (e) {
+                      print('FirebaseException ${e.message}');
+                      int h = 0;
+                    } catch (e1) {
+                      print(e1);
+                    }
+                  },
+                ))
+          ],
+        ),
+      );
+    } else {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Container(
+                height: 200,
+                child: imgNoFoto,
+              ),
+            ),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  print('upload pressed');
+
+                  FilePicker.platform
+                      .pickFiles(
+                    type: FileType.any,
+                    dialogTitle: 'выберите фото',
+                  )
+                      .then((value) {
+                    if (value != null && value.count > 0) {
+                      setState(() async {
+                        String fileName = value!.files.single.path!.substring(
+                            value!.files.single.path!.lastIndexOf('/') + 1);
+                        print(fileName);
+                        imgNoFoto = Image.file(File(value!.files.single.path!));
+
+                        if (fileName.trim().isNotEmpty) {
+                          bool? flag = await showDialog<bool>(
+                            context: context,
+                            builder: (BuildContext context) => AlertDialog(
+                              title: const Text('Внимание!'),
+                              content: Text('Загрузить фото?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: Text(
+                                    'OK',
+                                    style: txt15,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: Text(
+                                    'Cancel',
+                                    style: txt15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          print(flag);
+
+                          if (flag!) {
+                            try {
+                              Reference firebaseStorageRef =
+                                  FirebaseStorage.instance.ref().child(
+                                      "users_image/${context.read<DataCubit>().getUser.id}/$fileName");
+                              int y1 = 0;
+
+                              UploadTask uploadTask =
+                                  firebaseStorageRef.putFile(
+                                File(value!.files.single.path!),
+                              );
+                              TaskSnapshot taskSnapshot =
+                                  await uploadTask.whenComplete(() {
+                                print('uploaded');
+                              });
+                              int y2 = 0;
+                              String imageUrl =
+                                  await taskSnapshot.ref.getDownloadURL();
+                              int y3 = 0;
+                              print('Изображение загружено. URL: $imageUrl');
+
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(context.read<DataCubit>().getUser.id)
+                                  .update(
+                                {
+                                  'fotoUrl': imageUrl.trim(),
+                                },
+                              ).catchError((Error2) {
+                                print(Error2);
+                              }).whenComplete(() {
+                                setState(() {
+                                  context.read<DataCubit>().getUser.fotoUrl =
+                                      imageUrl;
+                                });
+                              });
+                            } on FirebaseException catch (e) {
+                              print('FirebaseException ${e.message}');
+                              int h = 0;
+                            } catch (err2) {
+                              print(err2);
+                            }
+                          }
+                        }
+                      });
+                    } else {
+                      print('Canceled');
+                    }
+                  });
+                },
+                child: Text(
+                  'upload foto',
+                  style: txt15,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
-
-    // if (fotoUrl.trim().isNotEmpty) {
-    return Center(
-      child: GestureDetector(
-        child: imgWidget,
-        onTap: () async {
-          print('tap image');
-
-          String ext = '.jpg';
-          // Create a storage reference from our app
-          final storageRef = FirebaseStorage.instance.ref();
-
-// Create a reference to "mountains.jpg"
-          // final mountainsRef =
-          //     storageRef.child(context.read<DataCubit>().getUser.id + ext);
-
-          FilePickerResult? result =
-              await FilePicker.platform.pickFiles(type: FileType.image);
-
-          if (result != null) {
-            File file = File(result.files.single.path!);
-            print(file.path);
-            int y = 0;
-
-            setState(() {
-              imgWidget = Text(file.path);
-            });
-          } else {
-            // User canceled the picker
-          }
-
-// // Create a reference to 'images/mountains.jpg'
-//           final mountainImagesRef = storageRef.child("users/$mountainsRef");
-
-          //   Directory appDocDir = await
-
-          // getDownloadsDirectory().then((value) {
-          //   print(value);
-          //   int y = 0;
-          // });
-
-          // String filePath = '${appDocDir.absolute}/file-to-upload.png';
-          // io.File file = io.File(filePath);
-        },
-      ),
-    );
   }
 }
