@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheduler_app/block/block.dart';
 import 'package:scheduler_app/constants.dart';
 import 'package:scheduler_app/model/events.dart';
+import 'package:scheduler_app/model/events_crud.dart';
 import 'package:scheduler_app/model/location.dart';
 import 'package:scheduler_app/model/users.dart';
 import 'package:scheduler_app/widgets/bottom_bar.dart';
@@ -18,9 +19,15 @@ class SchedulerView extends StatefulWidget {
 
 class _SchedulerViewState extends State<SchedulerView> {
   late Stream<QuerySnapshot<Map<String, dynamic>>> snapshot;
+  List<events> lstEvents = [];
 
   @override
   Widget build(BuildContext context) {
+    if (lstEvents.isNotEmpty) {
+      print(lstEvents);
+      int a = 0;
+    }
+
     if (context.read<DataCubit>().getUser.role == 'client') {
       snapshot = FirebaseFirestore.instance
           .collection('events')
@@ -46,7 +53,11 @@ class _SchedulerViewState extends State<SchedulerView> {
         ),
         actions: [
           IconButton(
-            onPressed: () async {
+            onPressed: () {
+              // var lst = await crud.getEvents();
+              // print(lst);
+              // int h = 0;
+
               events model = events.empty();
               Navigator.pushNamed(context, '/ShedulerAdd', arguments: model);
             },
@@ -78,6 +89,9 @@ class _SchedulerViewState extends State<SchedulerView> {
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) {
                 DocumentSnapshot ds = snapshot.data!.docs[index];
+                String LocationName = 'locationName';
+                events model = events.empty();
+
                 return Dismissible(
                   key: Key(ds.id),
                   onDismissed: (direction) {
@@ -98,8 +112,6 @@ class _SchedulerViewState extends State<SchedulerView> {
                   },
                   child: GestureDetector(
                     onLongPress: () {
-                      events model = events.fromDocSnapshot(ds);
-
                       Navigator.pushNamed(context, '/ShedulerAdd',
                           arguments: model);
                     },
@@ -116,7 +128,8 @@ class _SchedulerViewState extends State<SchedulerView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'location: ${ds['locations']['LocationName']}',
+                            // 'location: ${ds['locations']['LocationName']}',
+                            'location ${ds['location_id'].path}',
                             style: txt20,
                           ),
                           Text(

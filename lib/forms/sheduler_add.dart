@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as picker;
+import 'package:scheduler_app/block/block.dart';
 
 import 'package:scheduler_app/constants.dart';
 import 'package:scheduler_app/model/events.dart';
@@ -452,7 +455,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                       width: 100,
                       child: ElevatedButton(
                         child: const Text('OK'),
-                        onPressed: () {
+                        onPressed: () async {
                           String error = '';
                           print(widget.model);
 
@@ -475,7 +478,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                           if (strFinish == 'окончание') {
                             error += 'select finish! \r\n';
                           }
-
+                          //  есть ошибки
                           if (error.trim().isNotEmpty) {
                             showDialog<bool>(
                               context: context,
@@ -497,22 +500,34 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                             );
 
                             return;
-                          } else {
+                          }
+                          //  нет ошибок
+                          else {
+                            DocumentSnapshot<Map<String, dynamic>>
+                                locDocSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('locations')
+                                    .doc(widget.model.locations.id)
+                                    .get();
+
+                            DocumentReference locRef = locDocSnapshot.reference;
+
                             if (widget.model.id.trim().isNotEmpty) {
                               FirebaseFirestore.instance
                                   .collection('events')
                                   .doc(widget.model.id)
                                   .update(
                                     {
-                                      'locations':
-                                          widget.model.locations.toMap(),
+                                      'location_id': locRef,
                                       'start': widget.model.start,
                                       'finish': widget.model.finish,
                                       'client': widget.model.client.toMap(),
                                       'master': widget.model.master.toMap(),
                                     },
                                   )
-                                  .then((value) {})
+                                  .then((value) {
+                                    //==========
+                                  })
                                   .catchError((error) {
                                     print("Failed to add message: $error");
                                     int h = 0;
@@ -522,24 +537,27 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                                 FirebaseFirestore.instance
                                     .collection('events')
                                     .add(
-                                      {
-                                        'locations':
-                                            widget.model.locations.toMap(),
-                                        'start': widget.model.start,
-                                        'finish': widget.model.finish,
-                                        'client': widget.model.client.toMap(),
-                                        'master': widget.model.master.toMap(),
-                                      },
-                                    )
-                                    .then((value) {})
-                                    .catchError((error) {
-                                      print("Failed to add message: $error");
-                                    });
+                                  {
+                                    'location_id': locRef,
+                                    'start': widget.model.start,
+                                    'finish': widget.model.finish,
+                                    'client': widget.model.client.toMap(),
+                                    'master': widget.model.master.toMap(),
+                                  },
+                                ).then((value) {
+                                  setState(() {
+                                    context
+                                        .read<DataCubit>()
+                                        .addEvents(widget.model);
+                                  });
+                                }).catchError((error) {
+                                  print("Failed to add message: $error");
+                                });
                               } catch (e) {
                                 print(e);
                               }
                             }
-                            Navigator.pushNamed(context, '/SchedulerView',
+                            Navigator.pushNamed(context, '/ShedulerViewFuture',
                                 arguments: 0);
                           }
                         },
@@ -550,7 +568,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                       child: ElevatedButton(
                         child: const Text('Cancel'),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/SchedulerView',
+                          Navigator.pushNamed(context, '/ShedulerViewFuture',
                               arguments: 0);
                         },
                       ),
@@ -563,13 +581,5 @@ class _ShedulerAddState extends State<ShedulerAdd> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // DateTime start = DateTime.now().toLocal();
-    // strStart = dataFormat.format(start);
   }
 }

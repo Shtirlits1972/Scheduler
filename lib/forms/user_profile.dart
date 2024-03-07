@@ -64,9 +64,11 @@ class _UserProfileState extends State<UserProfile> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
+                flex: 3,
                 child: widgFoto,
               ),
               Expanded(
+                flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: TextField(
@@ -79,6 +81,7 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               Expanded(
+                flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
                   child: TextField(
@@ -92,6 +95,7 @@ class _UserProfileState extends State<UserProfile> {
               ),
               //   кнопки
               Expanded(
+                flex: 1,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -149,6 +153,7 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ),
               Expanded(
+                flex: 1,
                 child: Container(),
               )
             ],
@@ -169,7 +174,7 @@ class _UserProfileState extends State<UserProfile> {
         child: Column(
           children: [
             Expanded(
-              flex: 3,
+              flex: 5,
               child: Image.network(url),
             ),
             Expanded(
@@ -187,10 +192,6 @@ class _UserProfileState extends State<UserProfile> {
 
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Фото удалено!')));
-                      //   print('foto deleted');
-                      // }).catchError((err) {
-                      //   print(err);
-                      // });
 
                       await FirebaseFirestore.instance
                           .collection('users')
@@ -234,12 +235,11 @@ class _UserProfileState extends State<UserProfile> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(
-              child: Container(
-                height: 200,
-                child: imgNoFoto,
-              ),
+              flex: 5,
+              child: imgNoFoto,
             ),
             Expanded(
+              flex: 1,
               child: ElevatedButton(
                 onPressed: () {
                   print('upload pressed');

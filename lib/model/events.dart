@@ -10,32 +10,21 @@ class events {
   DateTime start = DateTime.now();
   DateTime finish = DateTime.now();
 
-  events(
-    this.id,
-    this.locations,
-    this.client,
-    this.master,
-    this.start,
-    this.finish,
-  );
+  events(this.id, this.locations, this.client, this.master, this.start,
+      this.finish);
 
   events.empty() {
-    String id = '';
-    location locations = location.empty();
-    users client = users.empty();
+    this.id = '';
+    this.locations = location.empty();
+    this.client = users.empty();
     client.role = 'client';
-    users master = users.empty();
+    this.master = users.empty();
     master.role = 'master';
-    DateTime start = DateTime.now();
-    DateTime finish = DateTime.now();
+    this.start = DateTime.now();
+    this.finish = DateTime.now();
   }
 
-  factory events.fromDocSnapshot(DocumentSnapshot ds) {
-    String locationId = ds['locations']['id'];
-    String locationName = ds['locations']['LocationName'];
-
-    location locat = location(locationId, locationName);
-
+  static events fromDocSnapshot(DocumentSnapshot ds) {
     String clientId = ds['client']['id'];
     String clientEmail = ds['client']['email'];
 
@@ -59,6 +48,15 @@ class events {
 
     users master = users(masterId, masterEmail, masterPassword, masterUserName,
         masterRole, masterIsApproved, masterFotoUrl);
+
+    String locationId = (ds['location_id'] as DocumentReference).id;
+
+    // DocumentSnapshot locationSnapshot = await FirebaseFirestore.instance
+    //     .collection('locations')
+    //     .doc(locationId)
+    //     .get();
+
+    location locat = location(locationId, '');
 
     return events(ds.id, locat, client, master, ds['start'].toDate(),
         ds['finish'].toDate());

@@ -9,6 +9,7 @@ import 'package:scheduler_app/forms/login_form.dart';
 import 'package:scheduler_app/forms/register_form.dart';
 import 'package:scheduler_app/forms/scheduler_view.dart';
 import 'package:scheduler_app/forms/sheduler_add.dart';
+import 'package:scheduler_app/forms/sheduler_view_future.dart';
 import 'package:scheduler_app/forms/user_profile.dart';
 import 'package:scheduler_app/forms/users_add_form.dart';
 import 'package:scheduler_app/forms/users_view.dart';
@@ -34,15 +35,25 @@ class AppRouter {
           builder: (context) => RegisterForm(),
         );
 
-      case '/SchedulerView':
+      case '/ShedulerViewFuture':
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: cubit,
-            child: SchedulerView(
+            child: ShedulerViewFuture(
               selectedIndex: 0,
             ),
           ),
         );
+
+      // case '/SchedulerView':
+      //   return MaterialPageRoute(
+      //     builder: (context) => BlocProvider.value(
+      //       value: cubit,
+      //       child: SchedulerView(
+      //         selectedIndex: 0,
+      //       ),
+      //     ),
+      //   );
 
       case '/UserProfile':
         return MaterialPageRoute(

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheduler_app/auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -110,7 +108,8 @@ class _LoginFormState extends State<LoginForm> {
                                       .read<DataCubit>()
                                       .setCurrentUser(userAvtorize);
 
-                                  Navigator.pushNamed(context, '/SchedulerView',
+                                  Navigator.pushNamed(
+                                      context, '/ShedulerViewFuture',
                                       arguments: 0);
                                 });
                               } else {
