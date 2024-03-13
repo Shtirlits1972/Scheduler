@@ -24,39 +24,50 @@ class events {
     this.finish = DateTime.now();
   }
 
-  static events fromDocSnapshot(DocumentSnapshot ds) {
-    String clientId = ds['client']['id'];
-    String clientEmail = ds['client']['email'];
+  static events short(DocumentSnapshot ds) {
+    location locations = location.empty();
+    locations.id = (ds['location_id'] as DocumentReference).id;
 
-    String clientPassword = ds['client']['password'];
-    String clientUserName = ds['client']['userName'];
-    String clientRole = ds['client']['role'];
-    bool clientIsApproved = ds['client']['IsApproved'];
-    String clientFotoUrl = ds['client']['fotoUrl'];
+    users client = users.empty();
+    client.role = 'client';
+    client.id = (ds['client_id'] as DocumentReference).id;
 
-    users client = users(clientId, clientEmail, clientPassword, clientUserName,
-        clientRole, clientIsApproved, clientFotoUrl);
+    users master = users.empty();
+    master.role = 'master';
+    master.id = (ds['master_id'] as DocumentReference).id;
 
-    String masterId = ds['master']['id'];
-    String masterEmail = ds['master']['email'];
+    return events(ds.id, locations, client, master, ds['start'].toDate(),
+        ds['finish'].toDate());
+  }
 
-    String masterPassword = ds['master']['password'];
-    String masterUserName = ds['master']['userName'];
-    String masterRole = ds['master']['role'];
-    bool masterIsApproved = ds['master']['IsApproved'];
-    String masterFotoUrl = ds['master']['fotoUrl'];
+  static Future<events> fromDocSnapshot(DocumentSnapshot ds) async {
+    String client_id = (ds['client_id'] as DocumentReference).id;
 
-    users master = users(masterId, masterEmail, masterPassword, masterUserName,
-        masterRole, masterIsApproved, masterFotoUrl);
+    DocumentSnapshot<Map<String, dynamic>> clientSn = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(client_id)
+        .get();
+    users client = users.fromDocumentSnapshot(clientSn);
 
+    String master_id = (ds['master_id'] as DocumentReference).id;
+
+    DocumentSnapshot<Map<String, dynamic>> masterSn = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(master_id)
+        .get();
+    users master = users.fromDocumentSnapshot(masterSn);
+    //----------------------------------
     String locationId = (ds['location_id'] as DocumentReference).id;
 
-    // DocumentSnapshot locationSnapshot = await FirebaseFirestore.instance
-    //     .collection('locations')
-    //     .doc(locationId)
-    //     .get();
+    DocumentSnapshot<Map<String, dynamic>> lockSn = await FirebaseFirestore
+        .instance
+        .collection('locations')
+        .doc(locationId)
+        .get();
 
-    location locat = location(locationId, '');
+    location locat = location.fromDocSnapshot(lockSn);
 
     return events(ds.id, locat, client, master, ds['start'].toDate(),
         ds['finish'].toDate());

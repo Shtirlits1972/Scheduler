@@ -4,7 +4,6 @@ import 'package:scheduler_app/app_router.dart';
 import 'package:scheduler_app/auth.dart';
 import 'package:scheduler_app/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:scheduler_app/forms/scheduler_view.dart';
 import 'firebase_options.dart';
 
 void main() async {

@@ -13,14 +13,14 @@ import 'package:scheduler_app/model/users.dart';
 import 'package:scheduler_app/widgets/user_select.dart';
 import 'package:scheduler_app/widgets/locations_select.dart';
 
-class ShedulerAdd extends StatefulWidget {
-  ShedulerAdd({Key? key, required this.model}) : super(key: key);
+class EventAdd extends StatefulWidget {
+  EventAdd({Key? key, required this.model}) : super(key: key);
   events model;
   @override
-  _ShedulerAddState createState() => _ShedulerAddState();
+  _EventAddState createState() => _EventAddState();
 }
 
-class _ShedulerAddState extends State<ShedulerAdd> {
+class _EventAddState extends State<EventAdd> {
   String strStart = 'начало';
   String strFinish = 'окончание';
   String strLocation = 'локация';
@@ -211,8 +211,12 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                             var snapshot = await collection.get();
 
                             for (int i = 0; i < snapshot.docs.length; i++) {
-                              location locat = location(snapshot.docs[i].id,
-                                  snapshot.docs[i]['LocationName']);
+                              location locat =
+                                  location.fromDocSnapshot(snapshot.docs[i]);
+
+                              // location(snapshot.docs[i].id,
+                              //     snapshot.docs[i]['LocationName']);
+
                               listLocations.add(locat);
                             }
 
@@ -511,27 +515,46 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                                     .get();
 
                             DocumentReference locRef = locDocSnapshot.reference;
+                            //======================================================
+                            DocumentSnapshot<Map<String, dynamic>>
+                                clientSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('users')
+                                    .doc(widget.model.client.id)
+                                    .get();
+
+                            DocumentReference clientRef =
+                                clientSnapshot.reference;
+                            //------------------------------------------------
+                            DocumentSnapshot<Map<String, dynamic>>
+                                masterSnapshot = await FirebaseFirestore
+                                    .instance
+                                    .collection('users')
+                                    .doc(widget.model.master.id)
+                                    .get();
+
+                            DocumentReference masterRef =
+                                masterSnapshot.reference;
+                            //======================================================
 
                             if (widget.model.id.trim().isNotEmpty) {
                               FirebaseFirestore.instance
                                   .collection('events')
                                   .doc(widget.model.id)
                                   .update(
-                                    {
-                                      'location_id': locRef,
-                                      'start': widget.model.start,
-                                      'finish': widget.model.finish,
-                                      'client': widget.model.client.toMap(),
-                                      'master': widget.model.master.toMap(),
-                                    },
-                                  )
-                                  .then((value) {
-                                    //==========
-                                  })
-                                  .catchError((error) {
-                                    print("Failed to add message: $error");
-                                    int h = 0;
-                                  });
+                                {
+                                  'location_id': locRef,
+                                  'start': widget.model.start,
+                                  'finish': widget.model.finish,
+                                  'client_id': clientRef,
+                                  'master_id': masterRef,
+                                },
+                              ).then((value) {
+                                //==========
+                              }).catchError((error) {
+                                print("Failed to add message: $error");
+                                int h = 0;
+                              });
                             } else {
                               try {
                                 FirebaseFirestore.instance
@@ -541,8 +564,8 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                                     'location_id': locRef,
                                     'start': widget.model.start,
                                     'finish': widget.model.finish,
-                                    'client': widget.model.client.toMap(),
-                                    'master': widget.model.master.toMap(),
+                                    'client_id': clientRef,
+                                    'master_id': masterRef,
                                   },
                                 ).then((value) {
                                   setState(() {
@@ -557,6 +580,7 @@ class _ShedulerAddState extends State<ShedulerAdd> {
                                 print(e);
                               }
                             }
+                            // ignore: use_build_context_synchronously
                             Navigator.pushNamed(context, '/ShedulerViewFuture',
                                 arguments: 0);
                           }

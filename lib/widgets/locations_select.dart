@@ -53,9 +53,30 @@ class _LocationsSelectState extends State<LocationsSelect> {
                       itemCount: snapshot.data!.docs.length,
                       itemBuilder: (context, index) {
                         DocumentSnapshot ds = snapshot.data!.docs[index];
+                        location lock = location.fromDocSnapshot(ds);
+
+                        Color color = Color.fromARGB(
+                            lock.color_s.alpha,
+                            lock.color_s.red,
+                            lock.color_s.green,
+                            lock.color_s.blue);
+                        int y = 0;
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RadioListTile(
+                            //                             int alpha = ds['color_s.alpha'];
+                            // int red = ds['color_s.red'];
+                            // int green = ds['color_s.green'];
+                            // int blue = ds['color_s.blue'];
+
+                            secondary: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
                             title: Text(
                               ds['LocationName'],
                               style: txt20,

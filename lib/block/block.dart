@@ -51,5 +51,24 @@ class DataCubit extends Cubit<Keeper> {
     state.location_List = new_locations_List;
   }
 
+  addLocation(location model) {
+    state.location_List.add(model);
+  }
+
+  updLocation(location model) {
+    int y = 0;
+    for (int i = 0; i < state.location_List.length; i++) {
+      if (state.location_List[i].id == model.id) {
+        state.location_List[i] = model;
+
+        for (int j = 0; j < state.events_list.length; j++) {
+          if (state.events_list[j].locations.id == model.id) {
+            state.events_list[j].locations = model;
+          }
+        }
+      }
+    }
+  }
+
   DataCubit(super.initState);
 }

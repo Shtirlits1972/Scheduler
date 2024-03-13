@@ -7,9 +7,8 @@ import 'package:scheduler_app/forms/location_add_form.dart';
 import 'package:scheduler_app/forms/location_view.dart';
 import 'package:scheduler_app/forms/login_form.dart';
 import 'package:scheduler_app/forms/register_form.dart';
-import 'package:scheduler_app/forms/scheduler_view.dart';
-import 'package:scheduler_app/forms/sheduler_add.dart';
-import 'package:scheduler_app/forms/sheduler_view_future.dart';
+import 'package:scheduler_app/forms/event_add.dart';
+import 'package:scheduler_app/forms/events_view.dart';
 import 'package:scheduler_app/forms/user_profile.dart';
 import 'package:scheduler_app/forms/users_add_form.dart';
 import 'package:scheduler_app/forms/users_view.dart';
@@ -39,7 +38,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: cubit,
-            child: ShedulerViewFuture(
+            child: EventsView(
               selectedIndex: 0,
             ),
           ),
@@ -104,7 +103,7 @@ class AppRouter {
       case '/ShedulerAdd':
         final events model = routeSettings.arguments as events;
         return MaterialPageRoute(
-          builder: (context) => ShedulerAdd(
+          builder: (context) => EventAdd(
             model: model,
           ),
         );

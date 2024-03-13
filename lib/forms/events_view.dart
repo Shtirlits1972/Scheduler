@@ -4,18 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:scheduler_app/block/block.dart';
 import 'package:scheduler_app/constants.dart';
 import 'package:scheduler_app/model/events.dart';
+import 'package:scheduler_app/model/location.dart';
+import 'package:scheduler_app/model/users.dart';
 import 'package:scheduler_app/widgets/bottom_bar.dart';
 
-class ShedulerViewFuture extends StatefulWidget {
-  ShedulerViewFuture({Key? key, required this.selectedIndex}) : super(key: key);
+class EventsView extends StatefulWidget {
+  EventsView({Key? key, required this.selectedIndex}) : super(key: key);
   int selectedIndex;
   @override
-  _ShedulerViewFutureState createState() => _ShedulerViewFutureState();
+  _EventsViewState createState() => _EventsViewState();
 }
 
-class _ShedulerViewFutureState extends State<ShedulerViewFuture> {
+class _EventsViewState extends State<EventsView> {
+  bool isLoaded = false;
   // ======
-  Future<List<events>> getLength(String userRole) async {
+  Future<List<events>> getEventList(String userRole) async {
     List<events> list = [];
 
     QuerySnapshot<Map<String, dynamic>> events_snapshot;
@@ -35,17 +38,22 @@ class _ShedulerViewFutureState extends State<ShedulerViewFuture> {
           await FirebaseFirestore.instance.collection('events').get();
     }
 
-    // QuerySnapshot<Map<String, dynamic>> events_snapshot =
-    //     await FirebaseFirestore.instance.collection('events').get();
-
     for (int i = 0; i < events_snapshot.docs.length; i++) {
-      events ev = events.fromDocSnapshot(events_snapshot.docs[i]);
-      DocumentSnapshot<Map<String, dynamic>> lock = await FirebaseFirestore
-          .instance
-          .collection('locations')
-          .doc(ev.locations.id)
-          .get();
-      ev.locations.LocationName = lock['LocationName'];
+      events ev = events.short(events_snapshot.docs[i]);
+      location lock = context
+          .read<DataCubit>()
+          .getLocations
+          .singleWhere((element) => element.id == ev.locations.id);
+      ev.locations = lock;
+
+      users master = context.read<DataCubit>().getAllUsers.singleWhere(
+          (element) => element.id == ev.master.id && element.role == 'master');
+      ev.master = master;
+
+      users client = context.read<DataCubit>().getAllUsers.singleWhere(
+          (element) => element.id == ev.client.id && element.role == 'client');
+      ev.client = client;
+
       list.add(ev);
     }
     return list;
@@ -73,7 +81,24 @@ class _ShedulerViewFutureState extends State<ShedulerViewFuture> {
           )
         ],
       ),
-      body: Center(
+      body: getCenterWidget(context),
+      bottomNavigationBar: BottomBarGeneral(
+        selectedIndex: widget.selectedIndex,
+        IsAdmin: context.read<DataCubit>().getUser.IsAdmin(),
+      ),
+    );
+  }
+
+  Center getCenterWidget(BuildContext context) {
+    if (context.read<DataCubit>().getEvents.isEmpty) {
+      return Center(
+        child: Text(
+          'No Data',
+          style: txt30,
+        ),
+      );
+    } else {
+      return Center(
         child: ListView.separated(
             separatorBuilder: (context, index) => const Divider(
                   color: Colors.black,
@@ -115,6 +140,31 @@ class _ShedulerViewFutureState extends State<ShedulerViewFuture> {
                     margin: const EdgeInsets.all(5.0),
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
+                      color: Color.fromARGB(
+                          context
+                              .read<DataCubit>()
+                              .getEvents[index]
+                              .locations
+                              .color_s
+                              .alpha,
+                          context
+                              .read<DataCubit>()
+                              .getEvents[index]
+                              .locations
+                              .color_s
+                              .red,
+                          context
+                              .read<DataCubit>()
+                              .getEvents[index]
+                              .locations
+                              .color_s
+                              .green,
+                          context
+                              .read<DataCubit>()
+                              .getEvents[index]
+                              .locations
+                              .color_s
+                              .blue),
                       borderRadius:
                           const BorderRadius.all(Radius.circular(15.0) //
                               ),
@@ -150,33 +200,18 @@ class _ShedulerViewFutureState extends State<ShedulerViewFuture> {
                 ),
               );
             }),
-      ),
-
-      //  FutureBuilder<int>(
-      //     future: getLength(),
-      //     builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-      //       return Center(
-      //         child: Text(
-      //           snapshot.data!.toString(),
-      //           style: txt20,
-      //         ),
-      //       );
-      //     }),
-      bottomNavigationBar: BottomBarGeneral(
-        selectedIndex: widget.selectedIndex,
-        IsAdmin: context.read<DataCubit>().getUser.IsAdmin(),
-      ),
-    );
+      );
+    }
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-
-    getLength(context.read<DataCubit>().getUser.role).then((value) {
-      context.read<DataCubit>().setEventsList(value);
-      setState(() {});
-    });
     super.initState();
+    getEventList(context.read<DataCubit>().getUser.role).then((value) {
+      setState(() {
+        context.read<DataCubit>().setEventsList(value);
+        isLoaded = true;
+      });
+    });
   }
 }

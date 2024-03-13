@@ -67,16 +67,29 @@ class _LocationViewState extends State<LocationView> {
                   child: GestureDetector(
                     onLongPress: () {
                       print('long press   ${ds['LocationName']} ');
-                      location model = location(ds.id, ds['LocationName']);
+                      location model = location.fromDocSnapshot(ds);
+
+                      //(ds.id, ds['LocationName']);
 
                       Navigator.pushNamed(context, '/LocationAddForm',
                           arguments: model);
                     },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
+                    child: ListTile(
+                      title: Text(
                         ds['LocationName'],
                         style: txt20,
+                      ),
+                      trailing: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: Color.fromARGB(
+                              ds['color_s.alpha'],
+                              ds['color_s.red'],
+                              ds['color_s.green'],
+                              ds['color_s.blue']),
+                        ),
                       ),
                     ),
                   ),
@@ -101,9 +114,9 @@ Future<List<location>> getLocations() async {
   var querySnapshots = await collection.get();
 
   for (var snapshot in querySnapshots.docs) {
-    String documentID = snapshot.id; // <-- Document ID
-    String LocationName = snapshot.data()['LocationName'];
-    location loc = location(documentID, LocationName);
+    // String documentID = snapshot.id; // <-- Document ID
+    // String LocationName = snapshot.data()['LocationName'];
+    location loc = location.fromDocSnapshot(snapshot);
     list.add(loc);
   }
 

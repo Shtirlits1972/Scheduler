@@ -5,10 +5,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:scheduler_app/block/block.dart';
 import 'package:scheduler_app/constants.dart';
-import 'package:scheduler_app/forms/scheduler_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:scheduler_app/model/auth_result.dart';
 import 'package:scheduler_app/model/events.dart';
+import 'package:scheduler_app/model/location.dart';
 import 'package:scheduler_app/model/users.dart';
 
 class LoginForm extends StatefulWidget {
@@ -177,5 +177,35 @@ class _LoginFormState extends State<LoginForm> {
         },
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    FirebaseFirestore.instance.collection('locations').get().then((value) {
+      List<location> listLocations = [];
+
+      for (int i = 0; i < value.docs.length; i++) {
+        location lock = location.fromDocSnapshot(value.docs[i]);
+        listLocations.add(lock);
+      }
+      setState(() {
+        context.read<DataCubit>().setLocations(listLocations);
+      });
+    });
+    //=============
+    FirebaseFirestore.instance.collection('users').get().then((value) {
+      List<users> listUsers = [];
+
+      for (int i = 0; i < value.docs.length; i++) {
+        users usr = users.fromDocumentSnapshot(value.docs[i]);
+        listUsers.add(usr);
+      }
+
+      setState(() {
+        context.read<DataCubit>().setUsersList(listUsers);
+      });
+    });
   }
 }
