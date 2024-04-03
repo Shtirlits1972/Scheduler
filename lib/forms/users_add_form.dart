@@ -207,13 +207,7 @@ class _UsersAddFormState extends State<UsersAddForm> {
                               FirebaseFirestore.instance
                                   .collection('users')
                                   .doc(widget.model.id)
-                                  .update({
-                                'email': emailController.text.trim(),
-                                'password': passwordController.text.trim(),
-                                'userName': userNameController.text.trim(),
-                                'role': widget.model.role,
-                                'IsApproved': IsApproved,
-                              });
+                                  .update(widget.model.toMap());
 
                               Navigator.pushNamed(context, '/UsersView',
                                   arguments: 3);
@@ -226,17 +220,11 @@ class _UsersAddFormState extends State<UsersAddForm> {
                             try {
                               FirebaseFirestore.instance
                                   .collection('users')
-                                  .add({
-                                    'email': emailController.text.trim(),
-                                    'password': passwordController.text.trim(),
-                                    'userName': userNameController.text.trim(),
-                                    'role': widget.model.role,
-                                    'IsApproved': IsApproved,
-                                  })
+                                  .add(widget.model.toMap())
                                   .then((value) {})
                                   .catchError((error) {
-                                    print("Failed to add message: $error");
-                                  });
+                                print("Failed to add message: $error");
+                              });
                               Navigator.pushNamed(context, '/UsersView',
                                   arguments: 3);
                             } on Exception catch (e) {

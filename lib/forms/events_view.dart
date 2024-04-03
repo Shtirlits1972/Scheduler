@@ -81,7 +81,9 @@ class _EventsViewState extends State<EventsView> {
           )
         ],
       ),
-      body: getCenterWidget(context),
+      body: BlocBuilder<DataCubit, Keeper>(builder: (context2, state) {
+        return getCenterWidget(context);
+      }),
       bottomNavigationBar: BottomBarGeneral(
         selectedIndex: widget.selectedIndex,
         IsAdmin: context.read<DataCubit>().getUser.IsAdmin(),
@@ -206,12 +208,17 @@ class _EventsViewState extends State<EventsView> {
 
   @override
   void initState() {
-    super.initState();
+    int h = 0;
     getEventList(context.read<DataCubit>().getUser.role).then((value) {
+      context.read<DataCubit>().setEventsList(value);
+      isLoaded = true;
       setState(() {
-        context.read<DataCubit>().setEventsList(value);
-        isLoaded = true;
+        print(value);
       });
+    }).catchError(() {
+      print('Error!');
     });
+    super.initState();
+    int h2 = 0;
   }
 }

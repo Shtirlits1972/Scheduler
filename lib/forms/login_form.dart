@@ -103,15 +103,14 @@ class _LoginFormState extends State<LoginForm> {
 
                                 print(userAvtorize);
 
-                                setState(() {
-                                  context
-                                      .read<DataCubit>()
-                                      .setCurrentUser(userAvtorize);
+                                //   setState(() {
+                                context
+                                    .read<DataCubit>()
+                                    .setCurrentUser(userAvtorize);
 
-                                  Navigator.pushNamed(
-                                      context, '/ShedulerViewFuture',
-                                      arguments: 0);
-                                });
+                                Navigator.pushNamed(context, '/EventsView',
+                                    arguments: 0);
+                                // });
                               } else {
                                 showDialog<bool>(
                                   context: context,

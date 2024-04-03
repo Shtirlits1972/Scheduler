@@ -31,10 +31,13 @@ class AppRouter {
 
       case '/RegisterForm':
         return MaterialPageRoute(
-          builder: (context) => RegisterForm(),
+          builder: (context) => BlocProvider.value(
+            value: cubit,
+            child: RegisterForm(),
+          ),
         );
 
-      case '/ShedulerViewFuture':
+      case '/EventsView':
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: cubit,
@@ -43,16 +46,6 @@ class AppRouter {
             ),
           ),
         );
-
-      // case '/SchedulerView':
-      //   return MaterialPageRoute(
-      //     builder: (context) => BlocProvider.value(
-      //       value: cubit,
-      //       child: SchedulerView(
-      //         selectedIndex: 0,
-      //       ),
-      //     ),
-      //   );
 
       case '/UserProfile':
         return MaterialPageRoute(
@@ -87,30 +80,42 @@ class AppRouter {
       case '/LocationAddForm':
         final location model = routeSettings.arguments as location;
         return MaterialPageRoute(
-          builder: (context) => LocationAddForm(
-            model: model,
+          builder: (context) => BlocProvider.value(
+            value: cubit,
+            child: LocationAddForm(
+              model: model,
+            ),
           ),
         );
 
       case '/UsersAddForm':
         final users model = routeSettings.arguments as users;
         return MaterialPageRoute(
-          builder: (context) => UsersAddForm(
-            model: model,
+          builder: (context) => BlocProvider.value(
+            value: cubit,
+            child: UsersAddForm(
+              model: model,
+            ),
           ),
         );
 
       case '/ShedulerAdd':
         final events model = routeSettings.arguments as events;
         return MaterialPageRoute(
-          builder: (context) => EventAdd(
-            model: model,
+          builder: (context) => BlocProvider.value(
+            value: cubit,
+            child: EventAdd(
+              model: model,
+            ),
           ),
         );
 
       default:
         return MaterialPageRoute(
-          builder: (context) => LoginForm(),
+          builder: (context) => BlocProvider.value(
+            value: cubit,
+            child: LoginForm(),
+          ),
         );
     }
   }

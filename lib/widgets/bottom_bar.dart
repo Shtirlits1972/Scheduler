@@ -21,7 +21,7 @@ class BottomBarGeneral extends StatelessWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.watch),
-            label: 'ShedulerViewFuture',
+            label: 'EventsView',
             backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(
@@ -49,8 +49,7 @@ class BottomBarGeneral extends StatelessWidget {
 
         onTap: (value) {
           if (value == 0) {
-            Navigator.pushNamed(context, '/ShedulerViewFuture',
-                arguments: value);
+            Navigator.pushNamed(context, '/EventsView', arguments: value);
           } else if (value == 1) {
             Navigator.pushNamed(context, '/UserProfile', arguments: value);
           } else if (value == 2) {
@@ -92,8 +91,7 @@ class BottomBarGeneral extends StatelessWidget {
         //  selectedItemColor: Colors.black,
         onTap: (value) {
           if (value == 0) {
-            Navigator.pushNamed(context, '/ShedulerViewFuture',
-                arguments: value);
+            Navigator.pushNamed(context, '/EventsView', arguments: value);
           } else if (value == 1) {
             Navigator.pushNamed(context, '/UserProfile', arguments: value);
           } else if (value == 2) {
